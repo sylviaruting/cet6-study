@@ -20,6 +20,17 @@
 
 首页可以「导出备份 / 导入备份」。请用 `npm run dev` 打开，本地数据库才会同步到项目文件夹。
 
+## 每周 DeepSeek 学情邮件
+
+每周日，或进入新的一周时打开首页，会自动用 DeepSeek 分析本周打卡 / 错题 / 做题情况，发到 `1434193887@qq.com`。
+
+1. 复制环境变量：`cp .env.example .env`
+2. 在 [DeepSeek 开放平台](https://platform.deepseek.com) 创建 API Key，填入 `DEEPSEEK_API_KEY`
+3. QQ 邮箱网页版：设置 → 账户 → 开启 SMTP 服务，生成授权码，填入 `QQ_SMTP_PASS`（不是 QQ 密码）
+4. 重启 `npm run dev`
+
+首页也可以点「立即生成本周分析」手动发一封。
+
 ## 本地运行
 
 ```bash
@@ -28,3 +39,5 @@ npm run dev
 ```
 
 浏览器打开终端里给出的本地地址即可。
+
+网页版（GitHub Pages）：https://sylviaruting.github.io/cet6-study/

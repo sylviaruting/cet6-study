@@ -3,6 +3,12 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Connect, Plugin } from 'vite'
+import {
+  isReportDue,
+  reportConfig,
+  runWeeklyReport,
+  type WeeklySnapshot,
+} from './weekly-report.ts'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const dataDir = path.join(root, 'data')
@@ -57,7 +63,11 @@ async function handle(
   next: Connect.NextFunction,
 ) {
   const url = req.url ?? ''
-  if (!url.startsWith('/api/progress') && !url.startsWith('/api/db')) {
+  if (
+    !url.startsWith('/api/progress') &&
+    !url.startsWith('/api/db') &&
+    !url.startsWith('/api/weekly-report')
+  ) {
     next()
     return
   }
@@ -66,6 +76,26 @@ async function handle(
   res.setHeader('Cache-Control', 'no-store')
 
   try {
+    if (url.startsWith('/api/weekly-report')) {
+      if (req.method === 'GET') {
+        const cfg = reportConfig()
+        res.end(JSON.stringify({ ok: true, ...cfg, due: isReportDue(cfg.lastSent) }))
+        return
+      }
+      if (req.method === 'POST') {
+        const body = JSON.parse(await readBody(req)) as {
+          snapshot: WeeklySnapshot
+          force?: boolean
+        }
+        const result = await runWeeklyReport(body.snapshot, Boolean(body.force))
+        res.end(JSON.stringify(result))
+        return
+      }
+      res.statusCode = 405
+      res.end(JSON.stringify({ ok: false, error: 'method not allowed' }))
+      return
+    }
+
     if (req.method === 'GET') {
       res.end(JSON.stringify({ ok: true, data: readDb() }))
       return
@@ -86,7 +116,12 @@ async function handle(
     res.end(JSON.stringify({ ok: false, error: 'method not allowed' }))
   } catch (error) {
     res.statusCode = 500
-    res.end(JSON.stringify({ ok: false, error: String(error) }))
+    res.end(
+      JSON.stringify({
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    )
   }
 }
 

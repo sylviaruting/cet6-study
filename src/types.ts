@@ -146,6 +146,7 @@ export interface AppState {
     minutes: number
   }
   planChecks: Record<string, boolean>
+  lastWeeklyReportAt: string
   updatedAt: string
 }
 

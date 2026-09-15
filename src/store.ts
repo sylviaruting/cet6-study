@@ -44,6 +44,7 @@ function defaultState(): AppState {
     mistakes: [],
     daily: { date: today(), wordsReviewed: 0, papersDone: 0, minutes: 0 },
     planChecks: {},
+    lastWeeklyReportAt: '',
     updatedAt: '',
   }
 }
@@ -75,6 +76,7 @@ function normalize(raw: unknown): AppState | null {
     mistakes: Array.isArray(input.mistakes) ? input.mistakes : [],
     daily: { ...defaultState().daily, ...input.daily },
     planChecks: input.planChecks ?? {},
+    lastWeeklyReportAt: input.lastWeeklyReportAt ?? '',
     updatedAt: input.updatedAt ?? '',
   }
   if (parsed.daily.date !== today()) {
@@ -392,6 +394,10 @@ export function reviewWord(wordId: string, knew: boolean) {
       },
     }
   })
+}
+
+export function markWeeklyReportSent(at: string) {
+  setState((prev) => ({ ...prev, lastWeeklyReportAt: at }))
 }
 
 export function togglePlanTask(date: string, taskId: string) {

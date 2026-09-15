@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { WORDS } from '../data/words'
-import { speakEnglish } from '../lib/tts'
+import { speakWord, stopSpeak } from '../lib/tts'
 import { addMistake, isWordDue, reviewWord, useStore } from '../store'
 import type { WordItem } from '../types'
 
@@ -46,6 +46,13 @@ export function Vocabulary() {
     setSpellChecked(false)
   }
 
+  useEffect(() => {
+    if (mode === 'list') return
+    if (mode === 'spell' && !spellChecked) return
+    speakWord(word.word)
+    return () => stopSpeak()
+  }, [word.id, mode, spellChecked])
+
   const mark = (knew: boolean, source: WordItem, userAnswer?: string) => {
     reviewWord(source.id, knew)
     if (!knew) {
@@ -67,7 +74,7 @@ export function Vocabulary() {
         <div>
           <p className="kicker">Vocabulary</p>
           <h1>六级单词</h1>
-          <p className="muted">先求见面眼熟，再求拼写。认识就拉长间隔，不认识就当天再来。</p>
+          <p className="muted">先求见面眼熟，再求拼写。每个单词会自动播词典英式录音，也可再点「英音」重听。</p>
         </div>
       </div>
 
@@ -130,8 +137,8 @@ export function Vocabulary() {
             </>
           )}
           <div className="btn-row" style={{ marginTop: 20 }} onClick={(e) => e.stopPropagation()}>
-            <button className="btn-ghost" onClick={() => speakEnglish(word.word, 0.9)}>
-              读音
+            <button className="btn-ghost" onClick={() => speakWord(word.word)}>
+              英音
             </button>
             <button className="btn-danger" onClick={() => mark(false, word)}>
               不认识
@@ -201,8 +208,8 @@ export function Vocabulary() {
             >
               检查
             </button>
-            <button className="btn-ghost" onClick={() => speakEnglish(word.word, 0.85)}>
-              听读音
+            <button className="btn-ghost" onClick={() => speakWord(word.word)}>
+              听英音
             </button>
           </div>
         </div>

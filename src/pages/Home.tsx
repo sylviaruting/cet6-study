@@ -11,6 +11,7 @@ import {
   useStore,
 } from '../store'
 import { PlanBoard } from '../components/PlanBoard'
+import { WeeklyReport } from '../components/WeeklyReport'
 import type { ModuleId } from '../types'
 
 const COUNTS: Record<ModuleId, number> = {
@@ -74,6 +75,8 @@ export function Home() {
           <div className="stat-label">词库 {WORDS.length} 个高频词</div>
         </div>
       </div>
+
+      <WeeklyReport />
 
       <div style={{ marginBottom: 20 }}>
         <PlanBoard />

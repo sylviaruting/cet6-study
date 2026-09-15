@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 
 # Editor directories and files
 .vscode/*
@@ -30,3 +31,4 @@ data/progress.json
 data/progress.json.tmp
 data/backups/*.json
 data/backups/*.db
+data/last-weekly-report.json

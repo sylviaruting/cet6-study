@@ -1,7 +1,8 @@
-import { useEffect, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { Page } from '../types'
-import { addStudyMinutes, persistLabel, usePersist, useStore } from '../store'
+import { persistLabel, usePersist, useStore } from '../store'
 import { go } from '../lib/nav'
+import { useStudyTimer } from '../lib/study-timer'
 
 const LINKS: { path: string; label: string; page: Page['name'] }[] = [
   { path: '#/home', label: '书房首页', page: 'home' },
@@ -13,12 +14,8 @@ const LINKS: { path: string; label: string; page: Page['name'] }[] = [
 export function Layout({ page, children }: { page: Page; children: ReactNode }) {
   const state = useStore()
   const persist = usePersist()
+  const timing = useStudyTimer()
   const openMistakes = state.mistakes.filter((m) => !m.mastered).length
-
-  useEffect(() => {
-    const timer = window.setInterval(() => addStudyMinutes(1), 60000)
-    return () => window.clearInterval(timer)
-  }, [])
 
   const active =
     page.name === 'home'
@@ -52,6 +49,7 @@ export function Layout({ page, children }: { page: Page; children: ReactNode }) 
           连续学习
           <strong>{state.streak.count} 天</strong>
           今日已学 {state.daily.minutes} 分钟
+          <div className="save-line">{timing ? '正在计时' : '已暂停计时'}</div>
           <div className="save-line">{persistLabel(persist)}</div>
         </div>
       </aside>
